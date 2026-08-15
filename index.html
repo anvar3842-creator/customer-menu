@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Hussain Restaurant - Customer Menu & Ordering</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 15px; }
+        .category-filters { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; }
+        .cat-btn { padding: 8px 15px; background: #e0e0e0; border: none; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; }
+        .cat-btn.active { background: #ff4757; color: white; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-card { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .menu-card h4 { margin: 10px 0 5px 0; font-size: 16px; color: #2c3e50; }
+        .menu-card p { color: #e74c3c; font-size: 15px; font-weight: bold; margin: 0 0 12px 0; }
+        .add-btn { background: #2ed573; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .add-btn:hover { background: #26af5f; }
+        .cart-section { margin-top: 30px; border-top: 2px solid #eee; padding-top: 15px; }
+        .submit-btn { width: 100%; background: #3498db; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Al Hussain Restaurant</h2>
+    
+    <!-- Category Filter Buttons -->
+    <div id="category-filters" class="category-filters">
+        <button class="cat-btn active" onclick="filterMenu('All')">All</button>
+    </div>
+
+    <!-- Menu Grid -->
+    <div id="menu-grid" class="menu-grid">
+        <!-- Dynamic Menu Items -->
+    </div>
+
+    <!-- Order Summary Section -->
+    <div class="cart-section">
+        <h3>Current Order</h3>
+        <ul id="cart-list" style="padding-left: 20px; color: #555;">
+            <li>Cart is empty</li>
+        </ul>
+        <button class="submit-btn" onclick="submitOrder()">Send Order to Kitchen</button>
+    </div>
+</div>
+
+<script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        databaseURL: "https://al-hussain-pos-default-rtdb.firebaseio.com/"
+    };
+    
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    let menuDataGlobal = [];
+    let currentCategory = 'All';
+    let cart = [];
+
+    // Load Menu from Firebase Realtime Database (Real-time sync)
+    function loadCustomerMenu() {
+        db.ref('menuData').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                menuDataGlobal = Array.isArray(data) ? data.filter(item => item !== null) : Object.values(data);
+                renderCategories(menuDataGlobal);
+                renderMenu(menuDataGlobal, currentCategory);
+            } else {
+                document.getElementById('menu-grid').innerHTML = '<p style="text-align:center; grid-column:span 2;">No menu items found.</p>';
+            }
+        });
+    }
+
+    // Render Categories dynamically
+    function renderCategories(items) {
+        const filtersContainer = document.getElementById('category-filters');
+        const categories = ['All', ...new Set(items.map(item => item.category).filter(Boolean))];
+        
+        filtersContainer.innerHTML = categories.map(cat => `
+            <button class="cat-btn ${cat === currentCategory ? 'active' : ''}" onclick="filterMenu('${cat}')">${cat}</button>
+        `).join('');
+    }
+
+    // Filter Menu by Category
+    function filterMenu(category) {
+        currentCategory = category;
+        renderCategories(menuDataGlobal);
+        renderMenu(menuDataGlobal, category);
+    }
+
+    // Render Menu Cards
+    function renderMenu(items, category) {
+        const grid = document.getElementById('menu-grid');
+        const filtered = category === 'All' ? items : items.filter(item => item.category === category);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; grid-column:span 2;">No items available in this category.</p>';
+            return;
+        }
+
+        grid.innerHTML = filtered.map(item => `
+            <div class="menu-card">
+                <div>${item.icon || '🍽️'}</div>
+                <h4>${item.name || 'Item'}</h4>
+                <p>$${parseFloat(item.price || 0).toFixed(2)}</p>
+                <button class="add-btn" onclick="addToCart('${item.name}', ${item.price})">Add</button>
+            </div>
+        `).join('');
+    }
+
+    // Add item to cart
+    function addToCart(name, price) {
+        const existingItem = cart.find(i => i.name === name);
+        if (existingItem) {
+            existingItem.qty += 1;
+        } else {
+            cart.push({ name, price, qty: 1 });
+        }
+        updateCartUI();
+    }
+
+    // Update Cart UI display
+    function updateCartUI() {
+        const cartList = document.getElementById('cart-list');
+        if (cart.length === 0) {
+            cartList.innerHTML = '<li>Cart is empty</li>';
+            return;
+        }
+
+        cartList.innerHTML = cart.map(item => `
+            <li>${item.name} x ${item.qty} - $${(item.price * item.qty).toFixed(2)}</li>
+        `).join('');
+    }
+
+    // Submit Order to Firebase activeOrders
+    function submitOrder() {
+        if (cart.length === 0) {
+            alert("Please add items to your cart first!");
+            return;
+        }
+
+        const orderData = {
+            items: cart,
+            timestamp: Date.now(),
+            status: "Pending"
+        };
+
+        db.ref('activeOrders').push(orderData)
+            .then(() => {
+                alert("Order sent to kitchen successfully! 🎉");
+                cart = [];
+                updateCartUI();
+            })
+            .catch((error) => {
+                alert("Failed to send order: " + error.message);
+            });
+    }
+
+    // Initialize on page load
+    window.onload = function() {
+        loadCustomerMenu();
+    };
+</script>
+
+</body>
+</html>
