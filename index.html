@@ -1187,7 +1187,31 @@
         </div>
     </div>
 
-    <div id="qr-modal" class="modal-overlay"><div class="modal-content" style="max-width: 650px;"><div class="modal-header"><h3 style="margin:0; font-size:18px;">Customer & Takeaway QR Codes</h3><div><button class="btn-small" onclick="printAllTableQRs()">Print All QRs</button><button class="close-modal" onclick="closeCustomerQRModal()" style="margin-left: 5px;">X</button></div></div><div class="modal-body"><p style="font-size: 14px; font-weight:bold; color: #64748b; margin-top: 0;">Scan table QR codes for dine-in, or the Takeaway QR code for parcel orders.</p><div id="qr-cards-grid" class="qr-card-container"></div></div></div></div>
+    <div id="qr-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3 style="margin:0; font-size:18px;">Customer & Takeaway QR Codes</h3>
+                <div>
+                    <button class="btn-small" onclick="printAllTableQRs()">Print All QRs</button>
+                    <button class="close-modal" onclick="closeCustomerQRModal()" style="margin-left: 5px;">X</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px;">
+                        <span style="font-size: 12px; font-weight: 800; color: #475569; white-space: nowrap;">Target Web URL:</span>
+                        <input type="text" id="qr-custom-base-url" style="flex: 1; padding: 6px 10px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 8px;" onchange="updateQRBaseUrl(this.value)">
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button type="button" class="btn-small" style="background: #0284c7; padding: 6px 10px; font-size: 11px;" onclick="resetQRBaseUrlToGitHub()">GitHub Pages</button>
+                        <button type="button" class="btn-small" style="background: #4f46e5; padding: 6px 10px; font-size: 11px;" onclick="setQRBaseUrlToCurrent()">This POS Domain</button>
+                    </div>
+                </div>
+                <p style="font-size: 13px; font-weight:bold; color: #64748b; margin-top: 0;">Scan table QR codes for dine-in, or the Takeaway QR code for parcel orders. Customers will only see their own table/order and the menu.</p>
+                <div id="qr-cards-grid" class="qr-card-container"></div>
+            </div>
+        </div>
+    </div>
     <div id="staff-modal" class="modal-overlay"><div class="modal-content" style="max-width: 650px;"><div class="modal-header"><h3 style="margin:0; font-size:18px;">Staff Shift & Performance Tracking</h3><button class="close-modal" onclick="closeStaffPerformanceModal()">X</button></div><div class="modal-body"><table class="admin-table"><thead><tr><th>Staff Role</th><th>Login Time</th><th style="text-align:center;">Bills</th><th style="text-align:right;">Collected ($)</th></tr></thead><tbody id="staff-performance-tbody"></tbody></table></div></div></div>
     
     <div id="menu-manager-modal" class="modal-overlay">
@@ -1612,16 +1636,6 @@
             if (permKey === 'take_orders') return true;
             if (permKey === 'billing') return false;
             return false;
-        }
-
-        function escapeHtml(text) {
-            if (text === null || text === undefined) return "";
-            return String(text)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
         }
 
         function renderLoginAccountsPreview() {
@@ -2723,12 +2737,6 @@
                 document.getElementById('display-user').innerText = key;
             }
 
-            // Show the customer's own table/order name in the cart panel
-            const cartTitleSpan = document.querySelector('#cart-panel-title > span');
-            if (cartTitleSpan) {
-                cartTitleSpan.innerText = isTakeaway ? ("🥡 Takeaway: " + key) : ("🍽️ Order: " + key);
-            }
-
             document.getElementById('customer-action-div').style.display = 'flex';
 
             if (isTakeaway) {
@@ -2887,6 +2895,25 @@
         }
 
         function applyRolePermissionsUI() {
+            if (isCustomerMode) {
+                const adminSection = document.getElementById('admin-dashboard-section');
+                if (adminSection) adminSection.style.display = 'none';
+                const staffBtns = document.getElementById('staff-action-buttons');
+                if (staffBtns) staffBtns.style.display = 'none';
+                const payRow = document.getElementById('payment-method-row');
+                if (payRow) payRow.style.display = 'none';
+                const discRow = document.getElementById('discount-row-elem');
+                if (discRow) discRow.style.display = 'none';
+                const homeBtn = document.getElementById('header-home-btn');
+                if (homeBtn) homeBtn.style.display = 'none';
+                const menuHomeBtn = document.getElementById('btn-menu-home-elem');
+                if (menuHomeBtn) menuHomeBtn.style.display = 'none';
+                const mobHomeBtn = document.getElementById('mob-home-btn');
+                if (mobHomeBtn) mobHomeBtn.style.display = 'none';
+                const tblView = document.getElementById('table-selection-view');
+                if (tblView) tblView.style.display = 'none';
+                return;
+            }
             const adminSection = document.getElementById('admin-dashboard-section');
             if (!adminSection) return;
 
@@ -3115,6 +3142,9 @@
         }
 
         function openTable(tableKey) {
+            if (isCustomerMode && currentTableKey && currentTableKey !== tableKey) {
+                return;
+            }
             if (isLinkedSlaveTable(tableKey)) {
                 const master = getMasterTableKey(tableKey);
                 alert(tableKey + ' is linked to ' + master + '. Opening ' + master + '.');
@@ -3141,7 +3171,9 @@
 
             const btnReady = document.getElementById('btn-ready-order-elem');
             if (btnReady) {
-                if (currentTableKey.startsWith("Order-")) {
+                if (isCustomerMode) {
+                    btnReady.style.display = "none";
+                } else if (currentTableKey.startsWith("Order-")) {
                     btnReady.style.display = "block";
                     const isReady = activeOrders[currentTableKey] && activeOrders[currentTableKey].isReady;
                     btnReady.innerText = isReady ? "Mark Order Not Ready" : "Mark Order Ready";
@@ -3206,8 +3238,8 @@
                         </div>
                     </div>
                     <div style="display:flex; align-items:center; gap:6px;">
-                        ${isCustomerMode ? '' : `<button type="button" class="btn-edit-seated-time" onclick="promptEditSeatedTime()" title="Edit seated time">✏️ Edit Time</button>`}
-                        ${(!isCustomerMode && (!order.items || order.items.length === 0)) ? `<button type="button" class="btn-edit-seated-time" style="color:#e11d48; border-color:#fecdd3;" onclick="cancelTableSeating()" title="Clear table">Clear Table</button>` : ''}
+                        <button type="button" class="btn-edit-seated-time" onclick="promptEditSeatedTime()" title="Edit seated time">✏️ Edit Time</button>
+                        ${(!order.items || order.items.length === 0) ? `<button type="button" class="btn-edit-seated-time" style="color:#e11d48; border-color:#fecdd3;" onclick="cancelTableSeating()" title="Clear table">Clear Table</button>` : ''}
                     </div>
                 `;
             } else if (!currentTableKey.startsWith('Order-') && !isCustomerMode) {
@@ -3255,7 +3287,6 @@
         }
 
         function promptEditSeatedTime() {
-            if (isCustomerMode) return;
             if (!currentTableKey || !activeOrders[currentTableKey]) return;
             const order = activeOrders[currentTableKey];
             const curInfo = order.seatedAt ? getSeatedDurationInfo(order.seatedAt) : { totalMinutes: 0 };
@@ -3270,7 +3301,6 @@
         }
 
         function cancelTableSeating() {
-            if (isCustomerMode) return;
             if (!hasPermission('cancel_orders')) {
                 alert("Permission denied: You do not have permission to clear table or cancel seating.");
                 return;
@@ -3533,14 +3563,16 @@
             }
         }, 30000);
 
-        // Calculation helpers with Option prices accurately multiplied by item quantity
+        // Calculation helpers with Option prices accurately multiplied by option quantity
         function getItemOptionTotal(item) {
             let total = 0;
             if (item && item.options) {
                 const opts = Array.isArray(item.options) ? item.options : Object.values(item.options);
                 opts.forEach(opt => {
                     if (opt && typeof opt === 'object') {
-                        total += Math.max(0, Number(opt.price !== undefined ? opt.price : (opt.extraPrice || 0)) || 0);
+                        const unitPrice = Math.max(0, Number(opt.price !== undefined ? opt.price : (opt.extraPrice || 0)) || 0);
+                        const optQty = Math.max(1, Number(opt.qty) || 1);
+                        total += (unitPrice * optQty);
                     }
                 });
             }
@@ -3550,7 +3582,8 @@
         function getItemLineTotal(item) {
             const qty = Math.max(0, Number(item && item.qty) || 0);
             const base = Math.max(0, Number(item && item.customPrice) || 0);
-            return (base * qty) + (getItemOptionTotal(item) * qty);
+            // Base item price multiplied by item quantity, plus exact option addition
+            return (base * qty) + getItemOptionTotal(item);
         }
 
         function getOrderSubtotal(orderData) {
@@ -4117,7 +4150,9 @@
                         const resolvedName = optName.trim();
                         const safeKey = resolvedName.replace(/[.#$\[\]\/]/g, '_');
                         if (cb.checked) {
-                            it.options[safeKey] = { name: resolvedName, price: optPrice };
+                            const existing = it.options[safeKey] || it.options[resolvedName];
+                            const curQty = (existing && existing.qty) ? Math.max(1, Number(existing.qty)) : 1;
+                            it.options[safeKey] = { name: resolvedName, price: optPrice, qty: curQty };
                         } else {
                             delete it.options[safeKey];
                             delete it.options[resolvedName];
@@ -4201,18 +4236,18 @@
             if (!item) return [];
             let list = [];
 
-            // 1. Takeaway & Dine-in portion breakdown (e.g. 2 Eat, 2 Takeaway)
+            // 1. Takeaway & Dine-in portion breakdown (e.g. 2 Dine-In, 2 Takeaway)
             const qty = Math.max(1, Number(item.qty) || 1);
             const tkQty = Math.max(0, Math.min(qty, Number(item.takeawayQty) || 0));
             if (tkQty > 0) {
                 if (tkQty === qty) {
-                    list.push(`🥡 All ${qty} Takeaway (பேக்)`);
+                    list.push(`🥡 All ${qty} Takeaway`);
                 } else {
                     const dineInQty = qty - tkQty;
-                    list.push(`🍽️ ${dineInQty} Dine-In (சாப்பிட) + 🥡 ${tkQty} Takeaway (பேக்)`);
+                    list.push(`🍽️ ${dineInQty} Dine-In + 🥡 ${tkQty} Takeaway`);
                 }
             } else if (item.notes && item.notes.takeaway && !item.takeawayQty) {
-                list.push("🥡 Takeaway (பேக்)");
+                list.push("🥡 Takeaway");
             }
 
             // 2. Custom category checkboxes in item.options (manually configured by user in Checkbox Manager)
@@ -4225,7 +4260,9 @@
                         } else if (typeof opt === 'object') {
                             const name = opt.name || opt.label || opt.title;
                             if (name && typeof name === 'string' && name.trim()) {
-                                list.push(name.trim());
+                                const optQty = Number(opt.qty) || 1;
+                                const suffix = optQty > 1 ? ` (${optQty}x)` : '';
+                                list.push(`${name.trim()}${suffix}`);
                             }
                         }
                     });
@@ -4239,7 +4276,9 @@
                         } else if (typeof v === 'object') {
                             const name = v.name || v.label || (k && !k.match(/^\d+$/) ? k.replace(/_/g, ' ') : '');
                             if (name && typeof name === 'string' && name.trim()) {
-                                list.push(name.trim());
+                                const optQty = Number(v.qty) || 1;
+                                const suffix = optQty > 1 ? ` (${optQty}x)` : '';
+                                list.push(`${name.trim()}${suffix}`);
                             }
                         }
                     });
@@ -4365,12 +4404,76 @@
                 const resolvedName = String(optName).replace(/&#39;/g, "'").replace(/&quot;/g, '"').trim();
                 const safeKey = resolvedName.replace(/[.#$\[\]\/]/g, '_');
                 if (checked) {
-                    item.options[safeKey] = { name: resolvedName, price: Number(optPrice) || 0 };
+                    item.options[safeKey] = {
+                        name: resolvedName,
+                        price: Number(optPrice) || 0,
+                        qty: 1
+                    };
                 } else {
                     delete item.options[safeKey];
                     delete item.options[resolvedName];
                     delete item.options[optName];
                 }
+                order.lastDeviceId = posDeviceId;
+                order.lastUpdatedAt = Date.now();
+                db.ref('activeOrders/' + currentTableKey).set(order);
+                renderCart();
+                flashLiveSyncSuccess();
+            }
+        }
+
+        function changeItemOptionQty(itemId, optName, delta) {
+            syncCartInputsToMemory();
+            let order = activeOrders[currentTableKey];
+            if (!order || !order.items) return;
+            let item = order.items.find(x => String(x.id) === String(itemId));
+            if (!item || !item.options) return;
+
+            const resolvedName = String(optName).replace(/&#39;/g, "'").replace(/&quot;/g, '"').trim();
+            const safeKey = resolvedName.replace(/[.#$\[\]\/]/g, '_');
+            let optObj = item.options[safeKey] || item.options[resolvedName];
+            if (!optObj && typeof item.options === 'object') {
+                optObj = Object.values(item.options).find(o => o && o.name === resolvedName);
+            }
+
+            if (optObj) {
+                let currentQty = Math.max(1, Number(optObj.qty) || 1);
+                let newQty = currentQty + delta;
+                if (newQty <= 0) {
+                    delete item.options[safeKey];
+                    delete item.options[resolvedName];
+                    delete item.options[optName];
+                } else {
+                    optObj.qty = newQty;
+                    item.options[safeKey] = optObj;
+                }
+                order.lastDeviceId = posDeviceId;
+                order.lastUpdatedAt = Date.now();
+                db.ref('activeOrders/' + currentTableKey).set(order);
+                renderCart();
+                flashLiveSyncSuccess();
+            }
+        }
+
+        function setItemOptionQty(itemId, optName, targetQty) {
+            syncCartInputsToMemory();
+            let order = activeOrders[currentTableKey];
+            if (!order || !order.items) return;
+            let item = order.items.find(x => String(x.id) === String(itemId));
+            if (!item || !item.options) return;
+
+            const resolvedName = String(optName).replace(/&#39;/g, "'").replace(/&quot;/g, '"').trim();
+            const safeKey = resolvedName.replace(/[.#$\[\]\/]/g, '_');
+            let optObj = item.options[safeKey] || item.options[resolvedName];
+            if (!optObj && typeof item.options === 'object') {
+                optObj = Object.values(item.options).find(o => o && o.name === resolvedName);
+            }
+
+            if (optObj) {
+                optObj.qty = Math.max(1, Number(targetQty) || 1);
+                item.options[safeKey] = optObj;
+                order.lastDeviceId = posDeviceId;
+                order.lastUpdatedAt = Date.now();
                 db.ref('activeOrders/' + currentTableKey).set(order);
                 renderCart();
                 flashLiveSyncSuccess();
@@ -4484,23 +4587,53 @@
 
                 let customOptsHtml = "";
                 if (catOpts.length > 0) {
-                    customOptsHtml = '<div class="note-checkboxes" style="margin-top:4px;">';
+                    customOptsHtml = '<div class="note-checkboxes" style="margin-top:6px; display:flex; flex-direction:column; gap:5px;">';
                     catOpts.forEach(opt => {
                         let isChecked = false;
+                        let optQty = 1;
                         if (item.options) {
                             if (Array.isArray(item.options)) {
-                                isChecked = item.options.some(o => (o && (o.name === opt.name || o === opt.name)));
+                                const found = item.options.find(o => (o && (o.name === opt.name || o === opt.name)));
+                                if (found) {
+                                    isChecked = true;
+                                    optQty = (typeof found === 'object' && found.qty) ? Math.max(1, Number(found.qty)) : 1;
+                                }
                             } else if (typeof item.options === 'object') {
                                 const safeKey = String(opt.name).replace(/[.#$\[\]\/]/g, '_');
-                                isChecked = Boolean(item.options[safeKey] || item.options[opt.name] || Object.values(item.options).some(o => o && o.name === opt.name));
+                                const found = item.options[safeKey] || item.options[opt.name] || Object.values(item.options).find(o => o && o.name === opt.name);
+                                if (found) {
+                                    isChecked = true;
+                                    optQty = (typeof found === 'object' && found.qty) ? Math.max(1, Number(found.qty)) : 1;
+                                }
                             }
                         }
                         const safeOptName = String(opt.name).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        const unitPrice = Number(opt.price) || 0;
+                        const totalOptCost = unitPrice * optQty;
+
                         customOptsHtml += `
-                            <label class="note-label">
-                                <input type="checkbox" class="custom-opt-checkbox" data-item-id="${item.id}" data-opt-name="${safeOptName}" data-opt-price="${Number(opt.price) || 0}" ${isChecked ? 'checked' : ''} onchange="toggleItemCustomOption('${item.id}', '${safeOptName}', this.checked, ${Number(opt.price) || 0})">
-                                ${opt.name} (+$ ${Number(opt.price).toFixed(2)})
-                            </label>
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 8px; background:${isChecked ? '#eff6ff' : '#f8fafc'}; border:1.5px solid ${isChecked ? '#93c5fd' : '#e2e8f0'}; border-radius:10px; flex-wrap:wrap;">
+                                <label class="note-label" style="margin:0; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:800; font-size:13px; color:${isChecked ? '#1e40af' : '#334155'};">
+                                    <input type="checkbox" class="custom-opt-checkbox" data-item-id="${item.id}" data-opt-name="${safeOptName}" data-opt-price="${unitPrice}" ${isChecked ? 'checked' : ''} onchange="toggleItemCustomOption('${item.id}', '${safeOptName}', this.checked, ${unitPrice})">
+                                    <span>${opt.name}</span>
+                                    <span style="color:#64748b; font-size:11.5px; font-weight:700;">(+$${unitPrice.toFixed(2)})</span>
+                                </label>
+                                ${isChecked ? `
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <div style="display:inline-flex; align-items:center; gap:3px; background:white; border:1.5px solid #cbd5e1; border-radius:8px; padding:1px 3px;">
+                                            <button type="button" style="width:22px; height:22px; border:none; background:#f1f5f9; border-radius:5px; font-weight:900; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#334155;" onclick="changeItemOptionQty('${item.id}', '${safeOptName}', -1)" title="Decrease option qty">-</button>
+                                            <span style="min-width:22px; text-align:center; font-size:13px; font-weight:900; color:#2563eb;">${optQty}</span>
+                                            <button type="button" style="width:22px; height:22px; border:none; background:#f1f5f9; border-radius:5px; font-weight:900; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#334155;" onclick="changeItemOptionQty('${item.id}', '${safeOptName}', 1)" title="Increase option qty">+</button>
+                                        </div>
+                                        ${totalQty > 1 && optQty !== totalQty ? `
+                                            <button type="button" style="font-size:11px; font-weight:800; border:1px solid #bfdbfe; background:#dbeafe; color:#1e40af; border-radius:6px; padding:2px 7px; cursor:pointer;" onclick="setItemOptionQty('${item.id}', '${safeOptName}', ${totalQty})" title="Set option for all ${totalQty}">All ${totalQty}</button>
+                                        ` : ''}
+                                        ${totalOptCost > 0 ? `
+                                            <span style="font-size:12px; font-weight:900; color:#059669;">+$${totalOptCost.toFixed(2)}</span>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
                         `;
                     });
                     customOptsHtml += '</div>';
@@ -4511,9 +4644,9 @@
 
                 let splitBadgeText = "";
                 if (tkQty === 0) {
-                    splitBadgeText = `(🍽️ All ${totalQty} Dine-In / சாப்பிட)`;
+                    splitBadgeText = `(🍽️ All ${totalQty} Dine-In)`;
                 } else if (tkQty === totalQty) {
-                    splitBadgeText = `(🥡 All ${totalQty} Takeaway / பேக்)`;
+                    splitBadgeText = `(🥡 All ${totalQty} Takeaway)`;
                 } else {
                     splitBadgeText = `(🍽️ ${totalQty - tkQty} Dine-In, 🥡 ${tkQty} Takeaway)`;
                 }
@@ -4535,7 +4668,7 @@
                                     </span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 4px;">
-                                    <span style="font-size: 11px; font-weight: 700; color: #64748b;">Takeaway (பேக்):</span>
+                                    <span style="font-size: 11px; font-weight: 700; color: #64748b;">Takeaway:</span>
                                     <button type="button" style="width: 26px; height: 26px; border: 1px solid #cbd5e1; background: white; color: #1e293b; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="adjustItemTakeawayQty('${item.id}', -1)">-</button>
                                     <span style="min-width: 20px; text-align: center; font-size: 13px; font-weight: 900; color: ${tkQty > 0 ? '#b45309' : '#1e293b'};">${tkQty}</span>
                                     <button type="button" style="width: 26px; height: 26px; border: 1px solid #cbd5e1; background: white; color: #1e293b; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="adjustItemTakeawayQty('${item.id}', 1)">+</button>
@@ -5268,6 +5401,44 @@
             });
         }
 
+        function getQRBaseUrl() {
+            let saved = localStorage.getItem('al_hussain_qr_base_url');
+            if (saved && saved.trim()) return saved.trim();
+            return "https://anvar3842-creator.github.io/al-hussain-menu/";
+        }
+
+        function updateQRBaseUrl(val) {
+            if (!val || !val.trim()) return;
+            let clean = val.trim();
+            if (!clean.endsWith('/')) clean += '/';
+            localStorage.setItem('al_hussain_qr_base_url', clean);
+            openCustomerQRModal();
+        }
+
+        function resetQRBaseUrlToGitHub() {
+            const githubUrl = "https://anvar3842-creator.github.io/al-hussain-menu/";
+            localStorage.setItem('al_hussain_qr_base_url', githubUrl);
+            const input = document.getElementById('qr-custom-base-url');
+            if (input) input.value = githubUrl;
+            openCustomerQRModal();
+        }
+
+        function setQRBaseUrlToCurrent() {
+            let cur = window.location.origin + window.location.pathname;
+            if (!cur.endsWith('/')) {
+                // If it ends with .html, keep the path or directory
+                if (cur.endsWith('.html')) {
+                    // keep full page url
+                } else {
+                    cur += '/';
+                }
+            }
+            localStorage.setItem('al_hussain_qr_base_url', cur);
+            const input = document.getElementById('qr-custom-base-url');
+            if (input) input.value = cur;
+            openCustomerQRModal();
+        }
+
         function openCustomerQRModal() {
             if (!hasPermission('qr_codes')) {
                 alert("Permission denied: You do not have permission to view or print QR Codes.");
@@ -5276,17 +5447,21 @@
             const grid = document.getElementById('qr-cards-grid');
             grid.innerHTML = "";
 
-            const liveBaseUrl = "https://anvar3842-creator.github.io/al-hussain-menu/";
+            const liveBaseUrl = getQRBaseUrl();
+            const input = document.getElementById('qr-custom-base-url');
+            if (input) input.value = liveBaseUrl;
 
             // Takeaway QR Card
             const tkCard = document.createElement('div');
             tkCard.className = "qr-card";
             tkCard.style.borderColor = "#7c3aed";
-            const tkQrUrl = `${liveBaseUrl}?order=takeaway`;
+            const separator = liveBaseUrl.includes('?') ? '&' : '?';
+            const tkQrUrl = `${liveBaseUrl}${separator}order=takeaway`;
             tkCard.innerHTML = `
-                <h4 style="color: #7c3aed;">Takeaway Order</h4>
+                <h4 style="color: #7c3aed;">🥡 Takeaway Order</h4>
                 <div id="qr-canvas-takeaway" style="display: flex; justify-content: center; margin: 10px 0;"></div>
-                <small style="color: #64748b; font-weight: bold;">Scan for Takeaway</small>
+                <small style="color: #64748b; font-weight: bold;">Scan for Takeaway (பார்சல்)</small>
+                <div style="font-size: 10px; color: #94a3b8; word-break: break-all; margin-top: 4px;">${tkQrUrl}</div>
             `;
             grid.appendChild(tkCard);
             new QRCode(tkCard.querySelector('#qr-canvas-takeaway'), { text: tkQrUrl, width: 140, height: 140 });
@@ -5296,11 +5471,12 @@
                 let tableKey = `Table ${i}`;
                 let card = document.createElement('div');
                 card.className = "qr-card";
-                let qrUrl = `${liveBaseUrl}?table=${encodeURIComponent(tableKey)}`;
+                let qrUrl = `${liveBaseUrl}${separator}table=${encodeURIComponent(tableKey)}`;
                 card.innerHTML = `
-                    <h4>${tableKey}</h4>
+                    <h4>🍽️ ${tableKey}</h4>
                     <div id="qr-canvas-${i}" style="display: flex; justify-content: center; margin: 10px 0;"></div>
                     <small style="color: #64748b; font-weight: bold;">Scan for Menu & Order</small>
+                    <div style="font-size: 10px; color: #94a3b8; word-break: break-all; margin-top: 4px;">${qrUrl}</div>
                 `;
                 grid.appendChild(card);
                 new QRCode(card.querySelector(`#qr-canvas-${i}`), { text: qrUrl, width: 140, height: 140 });
@@ -5316,7 +5492,8 @@
         function printAllTableQRs() {
             const printContainer = document.getElementById('print-qr-container');
             printContainer.innerHTML = "";
-            const liveBaseUrl = "https://anvar3842-creator.github.io/al-hussain-menu/";
+            const liveBaseUrl = getQRBaseUrl();
+            const separator = liveBaseUrl.includes('?') ? '&' : '?';
 
             // Takeaway
             let tkBox = document.createElement('div');
@@ -5325,7 +5502,7 @@
             tkBox.style.textAlign = "center";
             tkBox.innerHTML = `<h3 style="margin:0 0 10px 0;">TAKEAWAY ORDER</h3><div id="p-qr-tk" style="display:flex; justify-content:center;"></div><p style="margin:8px 0 0 0; font-weight:bold;">Scan to Order Takeaway</p>`;
             printContainer.appendChild(tkBox);
-            new QRCode(tkBox.querySelector('#p-qr-tk'), { text: `${liveBaseUrl}?order=takeaway`, width: 150, height: 150 });
+            new QRCode(tkBox.querySelector('#p-qr-tk'), { text: `${liveBaseUrl}${separator}order=takeaway`, width: 150, height: 150 });
 
             // Tables
             for (let i = 1; i <= 13; i++) {
@@ -5335,7 +5512,7 @@
                 box.style.textAlign = "center";
                 box.innerHTML = `<h3 style="margin:0 0 10px 0;">TABLE ${i}</h3><div id="p-qr-${i}" style="display:flex; justify-content:center;"></div><p style="margin:8px 0 0 0; font-weight:bold;">Scan to Order</p>`;
                 printContainer.appendChild(box);
-                new QRCode(box.querySelector(`#p-qr-${i}`), { text: `${liveBaseUrl}?table=Table%20${i}`, width: 150, height: 150 });
+                new QRCode(box.querySelector(`#p-qr-${i}`), { text: `${liveBaseUrl}${separator}table=Table%20${i}`, width: 150, height: 150 });
             }
 
             setTimeout(() => {
