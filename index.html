@@ -39,7 +39,8 @@
       html.is-customer-qr #staff-action-buttons,
       html.is-customer-qr #payment-method-row,
       html.is-customer-qr #discount-row-elem,
-      html.is-customer-qr .price-input {
+      html.is-customer-qr .price-input,
+      html.is-customer-qr #customer-paid-screen {
         display: none !important;
       }
       html.is-customer-qr .mobile-tab-bar {
@@ -390,8 +391,9 @@
         .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
         .card-price { font-weight: 900; font-size: 17px; color: #6d28d9; }
         
-        .btn-add { background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; display: flex; justify-content: center; align-items: center; font-weight: bold; opacity: 0; transition: all 0.3s; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
-        .menu-card:hover .btn-add { opacity: 1; transform: scale(1.1); }
+        .btn-add { background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; width: 34px; height: 34px; border-radius: 12px; font-size: 19px; display: flex; justify-content: center; align-items: center; font-weight: bold; opacity: .9; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.28); }
+        .menu-card:hover .btn-add { opacity: 1; transform: scale(1.12); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.42); }
+        .btn-add:active { transform: scale(0.94) !important; }
         .card-qty-badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 12px; font-weight: 900; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); border: 2px solid white; z-index: 2; }
 
         .right-panel h3 { margin-top: 0; color: var(--text-main); font-size: 18px; font-weight: 900; margin-bottom: 12px; border-bottom: 2px solid var(--border-light); padding-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -611,20 +613,28 @@
             position: absolute;
             top: 10px;
             right: 12px;
-            background: #fffbeb;
-            color: #b45309;
-            border: 1px solid #fde68a;
-            font-size: 10.5px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            border: none;
+            font-size: 9.5px;
             font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 6px;
+            padding: 3px 8px;
+            border-radius: 999px;
             display: inline-flex;
             align-items: center;
             gap: 3px;
             z-index: 1;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: 0 3px 8px rgba(217, 119, 6, 0.35);
             pointer-events: none;
+            letter-spacing: .2px;
+            max-width: calc(100% - 20px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
+        .card-pop-tag.pop-blue { background: linear-gradient(135deg, #0ea5e9, #0369a1); box-shadow: 0 3px 8px rgba(3, 105, 161, 0.35); }
+        .card-pop-tag.pop-green { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 3px 8px rgba(5, 150, 105, 0.35); }
+        .card-pop-tag.pop-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 3px 8px rgba(109, 40, 217, 0.35); }
         .item-rep-filter-btn {
             background: #f1f5f9;
             color: #475569;
@@ -647,6 +657,93 @@
             border-color: #4f46e5;
             box-shadow: 0 2px 6px rgba(79,70,229,0.25);
         }
+
+        /* ============================================================
+           UI POLISH LAYER — Purple Theme Refresh
+           Cleaner cards, softer shadows, smoother micro-interactions.
+           Happy to keep the familiar purple/cyan look — just tidier.
+           ============================================================ */
+
+        ::selection { background: rgba(124, 58, 237, .18); color: #172033; }
+        button { -webkit-tap-highlight-color: transparent; }
+        button:focus-visible { outline: 3px solid rgba(124, 58, 237, .45); outline-offset: 2px; }
+        input:focus-visible, select:focus-visible { outline: none; }
+
+        /* --- Login --- */
+        .login-overlay {
+            background:
+                radial-gradient(circle at 12% 18%, rgba(255,255,255,.16), transparent 24%),
+                radial-gradient(circle at 88% 84%, rgba(34,211,238,.20), transparent 30%),
+                radial-gradient(circle at 78% 10%, rgba(167,139,250,.26), transparent 28%),
+                linear-gradient(135deg, #241056, #5b21b6 50%, #0e7490);
+        }
+        .login-box { animation: boxRise .45s cubic-bezier(.22,1,.36,1); box-shadow: 0 32px 80px rgba(2,6,23,.42); }
+        @keyframes boxRise { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+        .login-box input { border-radius: 14px; }
+        .btn-login { border-radius: 14px; box-shadow: 0 10px 24px rgba(79,70,229,.32); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(79,70,229,.42); }
+        .btn-login:active { transform: translateY(0) scale(.98); }
+
+        /* --- Header --- */
+        .header { border-radius: 20px; box-shadow: 0 8px 24px rgba(15,23,42,.06); }
+        .header-home-btn, .btn-logout { border-radius: 12px; min-height: 38px; }
+        .btn-logout:active, .header-home-btn:active { transform: scale(.97); }
+
+        /* --- Table cards --- */
+        .big-table-card.free { background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 62%); }
+        .big-table-card.occupied { background: linear-gradient(180deg, #fff1f2 0%, #ffffff 62%); }
+        .big-table-card:active { transform: scale(.985); }
+
+        /* --- Menu cards --- */
+        .menu-card { border-radius: 20px; }
+        .card-code { background: #f5f3ff; color: #7c3aed; border: 1px solid #ede9fe; font-size: 10.5px; padding: 3px 9px; border-radius: 999px; }
+        .card-title { letter-spacing: .1px; }
+        .card-price { font-variant-numeric: tabular-nums; }
+
+        /* --- Category chips & navigation --- */
+        .cat-btn { border-width: 1.5px; box-shadow: 0 1px 3px rgba(15,23,42,.05); }
+        .cat-btn.active { box-shadow: 0 6px 18px rgba(109,40,217,.32); }
+        .cat-btn:active { transform: scale(.97); }
+        .cat-nav-btn { border-width: 1.5px; }
+        .cat-nav-btn:active { transform: scale(.92); }
+
+        /* --- Cart panel --- */
+        .qty-controls { border-radius: 999px; border-color: #e2e8f0; padding: 4px 7px; gap: 7px; }
+        .qty-btn { width: 32px; height: 32px; border-radius: 999px; font-size: 17px; }
+        .qty-btn:active { transform: scale(.9); }
+        .bill-summary { background: linear-gradient(180deg, #fafbff, #f4f6fd); border-color: #e8ecf7; border-radius: 16px; }
+        .total-row { border-top: 2px dashed #ddd6fe; font-variant-numeric: tabular-nums; }
+        .summary-row { font-variant-numeric: tabular-nums; }
+        #payment-method { border-radius: 12px; }
+
+        /* --- Action buttons: comfortable touch size + press feedback --- */
+        .action-buttons button { min-height: 46px; border-radius: 13px; }
+        .action-buttons button:active { transform: scale(.97); box-shadow: none !important; }
+
+        /* --- Mobile tab bar --- */
+        .mob-tab-btn { border-radius: 14px; min-height: 46px; }
+        .mob-tab-btn.active { box-shadow: 0 6px 16px rgba(109,40,217,.32); }
+        .mob-tab-btn:active { transform: scale(.97); }
+
+        /* --- Modals: smooth entrance --- */
+        @keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalPop { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-overlay, .timeout-overlay, #table-link-modal { animation: overlayFade .18s ease-out; }
+        .modal-content, .pay-modal-box, .timeout-box { animation: modalPop .24s cubic-bezier(.22,1,.36,1); }
+        .pay-btn-confirm:active, .pay-btn-cancel:active, .quick-cash-btn:active { transform: scale(.97); }
+        .quick-cash-btn { border-radius: 13px; }
+
+        /* --- Admin quick actions & misc --- */
+        .admin-btn { border-radius: 13px; }
+        .admin-btn:active { transform: translateX(4px) scale(.98); }
+        .staff-alert-banner { border-radius: 16px; }
+        .live-toast { border-radius: 14px; background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px solid rgba(139,92,246,.28); }
+        .btn-customer-send:active, .btn-call-waiter:active, .btn-ready-order:active, .btn-move-table:active { transform: scale(.97); }
+
+        /* --- Accessibility: respect reduced-motion preference --- */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+        }
     </style>
 <script src="/_aistudio-iframe.js?v=2c34bde1"></script></head>
 <body>
@@ -655,20 +752,20 @@
         <div class="timeout-box" style="text-align: left; max-width: 420px; width: 92%; padding: 26px 22px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);">
             <div style="text-align: center; margin-bottom: 18px;">
                 <div style="font-size: 38px; margin-bottom: 6px;">🥡</div>
-                <h2 style="color: #4f46e5; margin: 0; font-size: 21px; font-weight: 900;">Takeaway Order (பார்சல் ஆர்டர்)</h2>
+                <h2 style="color: #4f46e5; margin: 0; font-size: 21px; font-weight: 900;">Takeaway Order</h2>
                 <p style="margin: 4px 0 0; color: #64748b; font-size: 13px; font-weight: 700;">Please enter your name & mobile number to start ordering</p>
             </div>
             <form onsubmit="saveTakeawayCustomerDetails(event)">
                 <div style="margin-bottom: 14px;">
-                    <label style="font-size: 13px; font-weight: 800; color: #334155; display: block; margin-bottom: 4px;">Customer Name (பெயர்):</label>
+                    <label style="font-size: 13px; font-weight: 800; color: #334155; display: block; margin-bottom: 4px;">Customer Name:</label>
                     <input type="text" id="tk-cust-name" placeholder="e.g. Mohamed / Anvar" required style="width: 100%; padding: 12px 14px; border: 2px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; font-size: 15px; font-weight: 700; font-family: inherit; outline: none;">
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label style="font-size: 13px; font-weight: 800; color: #334155; display: block; margin-bottom: 4px;">Phone Number (மொபைல் எண்):</label>
+                    <label style="font-size: 13px; font-weight: 800; color: #334155; display: block; margin-bottom: 4px;">Phone Number:</label>
                     <input type="tel" id="tk-cust-phone" placeholder="e.g. 81234567" required style="width: 100%; padding: 12px 14px; border: 2px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; font-size: 15px; font-weight: 700; font-family: inherit; outline: none;">
                 </div>
                 <button type="submit" class="btn-login" style="width: 100%; padding: 14px; font-size: 15px; font-weight: 900; border-radius: 12px; background: linear-gradient(135deg, #7c3aed, #4f46e5); box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);">
-                    🍽️ Start Ordering / மெனுவிற்குச் செல்க
+                    🍽️ Start Ordering
                 </button>
             </form>
         </div>
@@ -890,16 +987,25 @@
         </div>
     </div>
 
-    <div id="customer-success-screen" class="timeout-overlay" style="z-index: 4000;">
-        <div class="timeout-box" style="padding: 30px;">
-            <h1 style="font-size: 55px; margin: 0 0 10px 0;">✅</h1>
-            <h2 style="color: #10b981;">Order Sent Successfully!</h2>
-            <p style="margin-bottom: 25px;">The kitchen has received your order and is preparing it right now.</p>
-            <button onclick="closeCustomerSuccess()" style="width: 100%; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer;">View Menu Again</button>
+    <div id="customer-success-screen" class="timeout-overlay" style="display: none; z-index: 9999; background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(8px);">
+        <div class="timeout-box" style="padding: 32px 24px; max-width: 420px; width: 92%; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);">
+            <div style="font-size: 56px; margin-bottom: 10px;">🙏</div>
+            <h2 style="color: #10b981; font-size: 24px; font-weight: 900; margin: 0 0 10px 0;">Thank You for Your Order!</h2>
+            <div id="customer-success-desc" style="margin-bottom: 18px; color: #475569; font-size: 14.5px; line-height: 1.5; font-weight: 600;">
+                The kitchen has received your order and is preparing it right now.
+            </div>
+            <div style="margin: 0 auto 20px; padding: 12px 18px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 800; color: #334155;">
+                <span>Redirecting to Google in</span>
+                <span id="google-redirect-sec" style="color: #4f46e5; font-size: 20px; font-weight: 900; min-width: 20px;">3</span>
+                <span>seconds...</span>
+            </div>
+            <button id="btn-goto-google" onclick="navigateToGooglePage()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; border: none; border-radius: 14px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4); outline: none;">
+                🌐 Go to Google Page Now
+            </button>
         </div>
     </div>
 
-    <div id="customer-paid-screen" class="timeout-overlay" style="z-index: 4600; display: none;">
+    <div id="customer-paid-screen" class="timeout-overlay" style="z-index: 4600; display: none !important;">
         <div class="timeout-box" style="padding: 28px 24px; max-width: 420px; width: 92%;">
             <div style="font-size: 52px; margin-bottom: 8px;">🧾</div>
             <h2 style="color: #059669; font-size: 22px; font-weight: 900; margin: 0 0 6px 0;">Payment Complete!</h2>
@@ -1638,6 +1744,16 @@
             return false;
         }
 
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return "";
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
         function renderLoginAccountsPreview() {
             const chipsContainer = document.getElementById('login-accounts-chips');
             if (!chipsContainer) return;
@@ -1999,11 +2115,44 @@
 
         db.ref('activeOrders').on('value', (snapshot) => {
             const raw = snapshot.val() || {};
+            const now = Date.now();
+            let missingSeatedUpdates = {};
+
             Object.keys(raw).forEach(k => {
-                if (raw[k]) {
-                    getOrderItemsArray(raw[k]);
+                const ord = raw[k];
+                if (!ord) return;
+                getOrderItemsArray(ord);
+
+                // Auto-repair missing or corrupt seatedAt for any table with active items
+                const hasItems = ord.items && ord.items.length > 0;
+                if (hasItems) {
+                    let parsed = parseSeatedTimestamp(ord.seatedAt) ||
+                                 parseSeatedTimestamp(ord.seatedTime) ||
+                                 parseSeatedTimestamp(ord.createdAt) ||
+                                 parseSeatedTimestamp(ord.customerSentAt) ||
+                                 parseSeatedTimestamp(ord.sentToKitchenAt) ||
+                                 parseSeatedTimestamp(ord.lastUpdatedAt);
+
+                    if (parsed) {
+                        ord.seatedAt = parsed;
+                        if (!ord.seatedTime) {
+                            ord.seatedTime = new Date(parsed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
+                    } else {
+                        // Truly missing seated time: initialize once and persist to Firebase
+                        ord.seatedAt = now;
+                        ord.seatedTime = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        missingSeatedUpdates[k + '/seatedAt'] = now;
+                        missingSeatedUpdates[k + '/seatedTime'] = ord.seatedTime;
+                    }
                 }
             });
+
+            // Persist any auto-repaired seatedAt timestamps to Firebase so they never get reset to 0 again!
+            if (Object.keys(missingSeatedUpdates).length > 0) {
+                db.ref('activeOrders').update(missingSeatedUpdates).catch(() => {});
+            }
+
             activeOrders = raw;
             if (isCustomerMode && isTakeawayCustomer && activeOrders[currentTableKey]) {
                 if (activeOrders[currentTableKey].isReady) {
@@ -2461,24 +2610,44 @@
             renderLiveStaffAlerts();
         });
 
-        db.ref('tableSessions').on('value', (snapshot) => {
-            tableSessions = snapshot.val() || {};
-            if (isCustomerMode && currentTableKey && tableSessions[currentTableKey]) {
-                const sess = tableSessions[currentTableKey];
-                if (sess.status === 'paid') {
-                    const elTable = document.getElementById('cust-paid-table-val');
-                    const elRef = document.getElementById('cust-paid-ref-val');
-                    const elMethod = document.getElementById('cust-paid-method-val');
-                    const elTotal = document.getElementById('cust-paid-total-val');
-                    if (elTable) elTable.innerText = currentTableKey;
-                    if (elRef) elRef.innerText = sess.invoiceRef || '-';
-                    if (elMethod) elMethod.innerText = sess.paymentMethod || 'Cash';
-                    if (elTotal) elTotal.innerText = Number(sess.total || 0).toFixed(2);
-                    const paidScreen = document.getElementById('customer-paid-screen');
-                    if (paidScreen) paidScreen.style.display = 'flex';
+        // TableSessions listener removed - customers scanning QR will NEVER see "Payment Complete"
+        try {
+            db.ref('tableSessions').remove().catch(() => {});
+        } catch(e) {}
+
+        const ALERT_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes auto-expiration
+
+        function cleanExpiredStaffAlerts() {
+            if (isCustomerMode) return;
+            const now = Date.now();
+            let changed = false;
+
+            Object.keys(newCustomerOrderAlerts || {}).forEach(tKey => {
+                const al = newCustomerOrderAlerts[tKey];
+                if (al && al.timestamp && (now - al.timestamp > ALERT_TIMEOUT_MS)) {
+                    delete newCustomerOrderAlerts[tKey];
+                    db.ref('newCustomerOrderAlerts/' + tKey).remove().catch(() => {});
+                    changed = true;
                 }
+            });
+
+            Object.keys(staffAlerts || {}).forEach(tKey => {
+                const al = staffAlerts[tKey];
+                if (al && al.timestamp && (now - al.timestamp > ALERT_TIMEOUT_MS)) {
+                    delete staffAlerts[tKey];
+                    db.ref('staffAlerts/' + tKey).remove().catch(() => {});
+                    changed = true;
+                }
+            });
+
+            if (changed) {
+                renderLiveStaffAlerts();
+                requestRenderBigTablesGrid();
             }
-        });
+        }
+
+        // Periodically remove alerts older than 5 minutes so screen never gets cluttered
+        setInterval(cleanExpiredStaffAlerts, 15000);
 
         function renderLiveStaffAlerts() {
             const container = document.getElementById('staff-live-alerts-container');
@@ -2488,21 +2657,30 @@
                 return;
             }
 
+            const now = Date.now();
             const orderKeys = Object.keys(newCustomerOrderAlerts);
             const waiterKeys = Object.keys(staffAlerts);
 
-            if (orderKeys.length === 0 && waiterKeys.length === 0) {
-                container.style.display = 'none';
-                container.innerHTML = "";
-                return;
-            }
+            let visibleOrderCount = 0;
+            let visibleWaiterCount = 0;
 
-            container.style.display = 'flex';
-            container.style.flexDirection = 'column';
             container.innerHTML = "";
 
             orderKeys.forEach(tKey => {
                 const al = newCustomerOrderAlerts[tKey];
+                if (!al) return;
+                const alertTime = al.timestamp || now;
+                const ageMs = now - alertTime;
+                if (ageMs > ALERT_TIMEOUT_MS) {
+                    delete newCustomerOrderAlerts[tKey];
+                    db.ref('newCustomerOrderAlerts/' + tKey).remove().catch(() => {});
+                    return;
+                }
+                visibleOrderCount++;
+
+                const remainingSecs = Math.max(0, Math.round((ALERT_TIMEOUT_MS - ageMs) / 1000));
+                const remainingMins = Math.ceil(remainingSecs / 60);
+
                 const isUp = !!al.isUpdate;
                 const sourceLabel = al.by ? al.by : (al.source || 'Customer');
                 const banner = document.createElement('div');
@@ -2515,7 +2693,7 @@
                                 <strong>${tKey}</strong>: ${isUp ? 'Order Updated (' + sourceLabel + ')' : 'New Order (' + sourceLabel + ')'}
                             </div>
                             <div style="font-size:12px; color:${isUp ? '#c2410c' : '#3b82f6'}; font-weight:700;">
-                                ${al.itemsCount || 1} items • $${Number(al.total || 0).toFixed(2)} • at ${al.timeStr || 'just now'}
+                                ${al.itemsCount || 1} items • $${Number(al.total || 0).toFixed(2)} • at ${al.timeStr || 'just now'} <span style="opacity:0.85; font-size:11px;">(⏱️ auto-clears in ${remainingMins}m)</span>
                             </div>
                         </div>
                     </div>
@@ -2529,6 +2707,19 @@
 
             waiterKeys.forEach(tKey => {
                 const al = staffAlerts[tKey];
+                if (!al) return;
+                const alertTime = al.timestamp || now;
+                const ageMs = now - alertTime;
+                if (ageMs > ALERT_TIMEOUT_MS) {
+                    delete staffAlerts[tKey];
+                    db.ref('staffAlerts/' + tKey).remove().catch(() => {});
+                    return;
+                }
+                visibleWaiterCount++;
+
+                const remainingSecs = Math.max(0, Math.round((ALERT_TIMEOUT_MS - ageMs) / 1000));
+                const remainingMins = Math.ceil(remainingSecs / 60);
+
                 const banner = document.createElement('div');
                 banner.className = 'staff-alert-banner waiter-type';
                 banner.innerHTML = `
@@ -2539,7 +2730,7 @@
                                 <strong>${tKey}</strong>: Customer Calling Waiter / Service!
                             </div>
                             <div style="font-size:12px; color:#b45309; font-weight:700;">
-                                Requested assistance at ${al.timeStr || 'just now'}
+                                Requested assistance at ${al.timeStr || 'just now'} <span style="opacity:0.85; font-size:11px;">(⏱️ auto-clears in ${remainingMins}m)</span>
                             </div>
                         </div>
                     </div>
@@ -2550,6 +2741,14 @@
                 `;
                 container.appendChild(banner);
             });
+
+            if (visibleOrderCount === 0 && visibleWaiterCount === 0) {
+                container.style.display = 'none';
+                container.innerHTML = "";
+            } else {
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+            }
         }
 
         function staffOpenAlertTable(tKey) {
@@ -2613,7 +2812,7 @@
                 let storedPhone = sessionStorage.getItem('myTkPhone');
 
                 // If already paid or no existing active session name, prompt for details
-                if (!storedTkKey || !storedName || !storedPhone || sessionStorage.getItem('paid_' + storedTkKey) === 'true') {
+                if (!storedTkKey || !storedName || !storedPhone) {
                     // Reset old session
                     sessionStorage.removeItem('myTakeawayKey');
                     const nameInput = document.getElementById('tk-cust-name');
@@ -2660,7 +2859,7 @@
             event.preventDefault();
             const name = document.getElementById('tk-cust-name').value.trim();
             const phone = document.getElementById('tk-cust-phone').value.trim();
-            if (!name || !phone) return alert("Please fill name and phone number! (பெயர் மற்றும் போன் நம்பர் உள்ளிடவும்)");
+            if (!name || !phone) return alert("Please fill customer name and phone number!");
 
             const submitBtn = event.target ? event.target.querySelector('button[type="submit"]') : null;
             if (submitBtn) {
@@ -2682,7 +2881,7 @@
                 if (error || !committed || assignedNum === null) {
                     if (submitBtn) {
                         submitBtn.disabled = false;
-                        submitBtn.textContent = "🍽️ Start Ordering / மெனுவிற்குச் செல்க";
+                        submitBtn.textContent = "🍽️ Start Ordering";
                     }
                     alert("Error generating order number. Please try again.");
                     return;
@@ -2710,7 +2909,7 @@
                 document.getElementById('takeaway-details-modal').style.display = 'none';
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = "🍽️ Start Ordering / மெனுவிற்குச் செல்க";
+                    submitBtn.textContent = "🍽️ Start Ordering";
                 }
                 initializeCustomerSession(storedTkKey, true);
             });
@@ -2743,7 +2942,9 @@
                 'btn-sound-test',
                 'staff-action-buttons',
                 'payment-method-row',
-                'discount-row-elem'
+                'discount-row-elem',
+                'customer-paid-screen',
+                'timeout-screen'
             ];
             navElementsToHide.forEach(id => {
                 const el = document.getElementById(id);
@@ -3215,12 +3416,52 @@
             applyRolePermissionsUI();
         }
 
+        // Robust parsing of any seated timestamp format (number, numeric string, ISO date, or locale time string)
+        function parseSeatedTimestamp(val) {
+            if (!val) return null;
+            if (typeof val === 'number' && !isNaN(val) && val > 0) return val;
+            if (typeof val === 'string') {
+                val = val.trim();
+                if (/^\d{11,14}$/.test(val)) {
+                    const n = Number(val);
+                    if (!isNaN(n) && n > 0) return n;
+                }
+                const parsedDate = new Date(val);
+                if (!isNaN(parsedDate.getTime()) && parsedDate.getTime() > 100000000000) {
+                    return parsedDate.getTime();
+                }
+                // Match time string e.g. "04:15 PM" or "16:20" or "4:15 pm"
+                const timeMatch = val.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/i);
+                if (timeMatch) {
+                    let h = parseInt(timeMatch[1], 10);
+                    const m = parseInt(timeMatch[2], 10);
+                    const ampm = timeMatch[3] ? timeMatch[3].toLowerCase() : null;
+                    if (ampm === 'pm' && h < 12) h += 12;
+                    if (ampm === 'am' && h === 12) h = 0;
+                    const now = new Date();
+                    const guess = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+                    let resultMs = guess.getTime();
+                    // If calculated time is slightly in the future (within 2 mins), cap to now
+                    if (resultMs > now.getTime() && (resultMs - now.getTime() < 120000)) {
+                        resultMs = now.getTime();
+                    }
+                    return resultMs;
+                }
+            }
+            return null;
+        }
+
         // Seated duration calculation and timing helpers
-        function getSeatedDurationInfo(seatedAt) {
-            if (!seatedAt) return { totalMinutes: 0, hours: 0, mins: 0, durationText: "0m", tier: "fresh" };
-            let ms = typeof seatedAt === 'number' ? seatedAt : new Date(seatedAt).getTime();
-            if (isNaN(ms) || ms <= 0) return { totalMinutes: 0, hours: 0, mins: 0, durationText: "0m", tier: "fresh" };
-            let diffMs = Math.max(0, Date.now() - ms);
+        function getSeatedDurationInfo(seatedAt, fallbackTimeStr) {
+            let ms = parseSeatedTimestamp(seatedAt);
+            if (!ms && fallbackTimeStr) {
+                ms = parseSeatedTimestamp(fallbackTimeStr);
+            }
+            if (!ms || ms <= 0) {
+                return { totalMinutes: 0, hours: 0, mins: 0, durationText: "0m", tier: "fresh" };
+            }
+            const now = Date.now();
+            let diffMs = Math.max(0, now - ms);
             let totalMinutes = Math.floor(diffMs / 60000);
             let hours = Math.floor(totalMinutes / 60);
             let mins = totalMinutes % 60;
@@ -3250,9 +3491,10 @@
                 return;
             }
             const order = activeOrders[currentTableKey];
-            if (order && order.seatedAt) {
-                const dur = getSeatedDurationInfo(order.seatedAt);
-                const startTimeStr = order.seatedTime || new Date(order.seatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const orderSeatedMs = order ? (parseSeatedTimestamp(order.seatedAt) || parseSeatedTimestamp(order.seatedTime)) : null;
+            if (order && (orderSeatedMs || order.seatedAt || order.seatedTime)) {
+                const dur = getSeatedDurationInfo(order.seatedAt, order.seatedTime);
+                const startTimeStr = order.seatedTime || (orderSeatedMs ? new Date(orderSeatedMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
                 bar.style.display = 'flex';
                 bar.className = 'cart-seated-bar ' + (dur.tier === 'long' ? 'timer-long' : (dur.tier === 'medium' ? 'timer-medium' : 'timer-fresh'));
                 bar.innerHTML = `
@@ -3404,10 +3646,25 @@
                 if (currentTableFilter === 'occupied' && !isOccupied) continue;
                 if (currentTableFilter === 'available' && isOccupied) continue;
 
-                // Auto-set seatedAt in memory if missing (does not trigger Firebase loop during render)
-                if (isOccupied && orderData && !orderData.seatedAt) {
-                    orderData.seatedAt = Date.now();
-                    orderData.seatedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (isOccupied && orderData) {
+                    let parsed = parseSeatedTimestamp(orderData.seatedAt) ||
+                                 parseSeatedTimestamp(orderData.seatedTime) ||
+                                 parseSeatedTimestamp(orderData.createdAt) ||
+                                 parseSeatedTimestamp(orderData.customerSentAt) ||
+                                 parseSeatedTimestamp(orderData.sentToKitchenAt) ||
+                                 parseSeatedTimestamp(orderData.lastUpdatedAt);
+                    if (parsed) {
+                        orderData.seatedAt = parsed;
+                        if (!orderData.seatedTime) {
+                            orderData.seatedTime = new Date(parsed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
+                    } else {
+                        const now = Date.now();
+                        orderData.seatedAt = now;
+                        orderData.seatedTime = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        db.ref('activeOrders/' + effectiveKey + '/seatedAt').set(now).catch(() => {});
+                        db.ref('activeOrders/' + effectiveKey + '/seatedTime').set(orderData.seatedTime).catch(() => {});
+                    }
                 }
 
                 let itemCount = hasItems ? orderData.items.reduce((s, x) => s + x.qty, 0) : 0;
@@ -3415,10 +3672,11 @@
 
                 // Seated duration indicator banner
                 let seatedBannerHtml = "";
-                if (isOccupied && orderData && orderData.seatedAt) {
-                    let dur = getSeatedDurationInfo(orderData.seatedAt);
+                if (isOccupied && orderData && (orderData.seatedAt || orderData.seatedTime)) {
+                    let dur = getSeatedDurationInfo(orderData.seatedAt, orderData.seatedTime);
                     let bannerClass = dur.tier === 'long' ? 'timer-long' : (dur.tier === 'medium' ? 'timer-medium' : 'timer-fresh');
-                    let startStr = orderData.seatedTime || new Date(orderData.seatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const sMs = parseSeatedTimestamp(orderData.seatedAt) || parseSeatedTimestamp(orderData.seatedTime);
+                    let startStr = orderData.seatedTime || (sMs ? new Date(sMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
                     seatedBannerHtml = `
                     <div class="table-seated-banner ${bannerClass}" title="Customer seated at ${startStr}">
                         <div class="seated-timer-row">
@@ -3433,8 +3691,12 @@
                 card.className = `big-table-card ${isOccupied ? 'occupied' : 'free'} ${isLinked ? 'linked-table-card' : ''}`;
                 card.onclick = () => openTable(tableKey);
 
-                let orderAlert = newCustomerOrderAlerts[tableKey] || (orderData && orderData.customerSent && !orderData.staffAcknowledged);
-                let waiterAlert = staffAlerts[tableKey];
+                let orderAlertData = newCustomerOrderAlerts[tableKey];
+                let isOrderAlertActive = orderAlertData && (!orderAlertData.timestamp || (Date.now() - orderAlertData.timestamp <= ALERT_TIMEOUT_MS));
+                let orderAlert = isOrderAlertActive || (orderData && orderData.customerSent && !orderData.staffAcknowledged && (!orderData.customerSentAt || (Date.now() - orderData.customerSentAt <= ALERT_TIMEOUT_MS)));
+
+                let waiterAlertData = staffAlerts[tableKey];
+                let waiterAlert = waiterAlertData && (!waiterAlertData.timestamp || (Date.now() - waiterAlertData.timestamp <= ALERT_TIMEOUT_MS));
 
                 if (orderAlert) {
                     card.style.borderColor = "#2563eb";
@@ -3519,18 +3781,32 @@
                         if (currentTableFilter === 'available') return;
                         renderedTableKeys.add(norm);
 
-                        if (!orderData.seatedAt) {
-                            orderData.seatedAt = Date.now();
-                            orderData.seatedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        let parsedTk = parseSeatedTimestamp(orderData.seatedAt) ||
+                                       parseSeatedTimestamp(orderData.seatedTime) ||
+                                       parseSeatedTimestamp(orderData.createdAt) ||
+                                       parseSeatedTimestamp(orderData.customerSentAt) ||
+                                       parseSeatedTimestamp(orderData.lastUpdatedAt);
+                        if (parsedTk) {
+                            orderData.seatedAt = parsedTk;
+                            if (!orderData.seatedTime) {
+                                orderData.seatedTime = new Date(parsedTk).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            }
+                        } else {
+                            const now = Date.now();
+                            orderData.seatedAt = now;
+                            orderData.seatedTime = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            db.ref('activeOrders/' + key + '/seatedAt').set(now).catch(() => {});
+                            db.ref('activeOrders/' + key + '/seatedTime').set(orderData.seatedTime).catch(() => {});
                         }
 
                         let itemCount = orderData.items.reduce((s, x) => s + x.qty, 0);
                         let orderTotal = getOrderGrandTotal(orderData);
                         let isReady = orderData.isReady;
 
-                        let dur = getSeatedDurationInfo(orderData.seatedAt);
+                        let dur = getSeatedDurationInfo(orderData.seatedAt, orderData.seatedTime);
                         let bannerClass = isReady ? 'timer-fresh' : (dur.tier === 'long' ? 'timer-long' : 'timer-medium');
-                        let startStr = orderData.seatedTime || new Date(orderData.seatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const sTkMs = parseSeatedTimestamp(orderData.seatedAt) || parseSeatedTimestamp(orderData.seatedTime);
+                        let startStr = orderData.seatedTime || (sTkMs ? new Date(sTkMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'just now');
                         let waitBannerHtml = `
                         <div class="table-seated-banner ${bannerClass}" title="Ordered at ${startStr}">
                             <div class="seated-timer-row">
@@ -3587,7 +3863,7 @@
             if (posView && posView.style.display !== 'none' && currentTableKey) {
                 updateCartSeatedDisplay();
             }
-        }, 30000);
+        }, 15000);
 
         function getItemOptionsMap(item) {
             if (!item) return {};
@@ -3990,13 +4266,13 @@
                             if (todaySold === maxTodaySoldInCat && maxTodaySoldInCat > 0) {
                                 popBadgeHtml = `<div class="card-pop-tag" title="Today's top seller">★ #1 Today (${todaySold} sold)</div>`;
                             } else if (todaySold >= 3) {
-                                popBadgeHtml = `<div class="card-pop-tag" style="background:rgba(2,132,199,0.92);" title="Sold today">★ ${todaySold} sold today</div>`;
+                                popBadgeHtml = `<div class="card-pop-tag pop-blue" title="Sold today">★ ${todaySold} sold today</div>`;
                             } else {
-                                popBadgeHtml = `<div class="card-pop-tag" style="background:rgba(16,185,129,0.92);" title="Sold today">★ ${todaySold} sold today</div>`;
+                                popBadgeHtml = `<div class="card-pop-tag pop-green" title="Sold today">★ ${todaySold} sold today</div>`;
                             }
                         } else if (itemIdx === 0 && allTimeSold >= 5) {
                             // If 0 sold today, but item is an all-time bestseller, show clean tag without yesterday's numbers
-                            popBadgeHtml = `<div class="card-pop-tag" style="background:rgba(79,70,229,0.85);" title="All-time popular item">★ Bestseller</div>`;
+                            popBadgeHtml = `<div class="card-pop-tag pop-purple" title="All-time popular item">★ Bestseller</div>`;
                         }
 
                         card.innerHTML = `
@@ -4061,12 +4337,12 @@
                             if (todaySold === maxTodaySoldOther && maxTodaySoldOther > 0) {
                                 popBadgeHtml = `<div class="card-pop-tag" title="Today's top seller">★ #1 Today (${todaySold} sold)</div>`;
                             } else if (todaySold >= 3) {
-                                popBadgeHtml = `<div class="card-pop-tag" style="background:rgba(2,132,199,0.92);" title="Sold today">★ ${todaySold} sold today</div>`;
+                                popBadgeHtml = `<div class="card-pop-tag pop-blue" title="Sold today">★ ${todaySold} sold today</div>`;
                             } else {
-                                popBadgeHtml = `<div class="card-pop-tag" style="background:rgba(16,185,129,0.92);" title="Sold today">★ ${todaySold} sold today</div>`;
+                                popBadgeHtml = `<div class="card-pop-tag pop-green" title="Sold today">★ ${todaySold} sold today</div>`;
                             }
                         } else if (itemIdx === 0 && allTimeSold >= 5) {
-                            popBadgeHtml = `<div class="card-pop-tag" style="background:rgba(79,70,229,0.85);" title="All-time popular item">★ Bestseller</div>`;
+                            popBadgeHtml = `<div class="card-pop-tag pop-purple" title="All-time popular item">★ Bestseller</div>`;
                         }
 
                         card.innerHTML = `
@@ -4714,8 +4990,18 @@
                 return;
             }
 
+            const isDedicatedTakeaway = Boolean(
+                isTakeawayCustomer || 
+                (currentTableKey && currentTableKey.startsWith("Order-"))
+            );
+
             items.forEach(item => {
                 const totalQty = Math.max(1, Number(item.qty) || 1);
+                if (isDedicatedTakeaway) {
+                    item.takeawayQty = totalQty;
+                    if (!item.notes || typeof item.notes !== 'object') item.notes = {};
+                    item.notes.takeaway = true;
+                }
                 const tkQty = Math.max(0, Math.min(totalQty, Number(item.takeawayQty) || 0));
                 const tr = document.createElement('tr');
                 const lineTotal = getItemLineTotal(item);
@@ -4776,6 +5062,10 @@
                     <td>
                         <div class="cart-item-name">${item.name}</div>
                         ${customOptsHtml}
+                        ${isDedicatedTakeaway ? `
+                        <div style="margin-top: 5px; margin-bottom: 5px; display: inline-flex; align-items: center; gap: 6px; background: #fffbeb; border: 1.5px solid #fde68a; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; color: #b45309;">
+                            <span>🥡</span> <span>Takeaway (Parcel) • All ${totalQty}</span>
+                        </div>` : `
                         <div style="margin-top: 6px; margin-bottom: 6px; background: ${tkQty > 0 ? '#fffbeb' : '#f8fafc'}; border: 1.5px solid ${tkQty > 0 ? '#f59e0b' : '#e2e8f0'}; padding: 6px 10px; border-radius: 10px;">
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                                 <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800;">
@@ -4807,11 +5097,12 @@
                                     🍽️ All ${totalQty} Dine-In
                                 </button>
                             </div>` : ''}
-                        </div>
+                        </div>`
+                        }
                         <div style="margin-top: 4px;">
                             <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; align-items: center;">
                                 <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Quick Notes:</span>
-                                ${(tkQty > 0 && tkQty < totalQty) ? `
+                                ${(!isDedicatedTakeaway && tkQty > 0 && tkQty < totalQty) ? `
                                 <button type="button" style="font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; border: 1px dashed #f59e0b; background: #fffbeb; color: #b45309; cursor: pointer;" onclick="quickAppendItemNote('${item.id}', '${totalQty - tkQty} Dine, ${tkQty} Pack')">
                                     ➕ ${totalQty - tkQty} Dine, ${tkQty} Pack
                                 </button>` : ''}
@@ -4905,22 +5196,62 @@
             }
         }
 
+        let googleCountdownInterval = null;
+        function startGoogleRedirectCountdown(seconds) {
+            if (seconds === undefined) seconds = 3;
+            if (googleCountdownInterval) {
+                clearInterval(googleCountdownInterval);
+                googleCountdownInterval = null;
+            }
+            let timeLeft = seconds;
+            const secSpan = document.getElementById("google-redirect-sec");
+            if (secSpan) secSpan.textContent = timeLeft;
+
+            googleCountdownInterval = setInterval(() => {
+                timeLeft--;
+                const elem = document.getElementById("google-redirect-sec");
+                if (elem) elem.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(googleCountdownInterval);
+                    googleCountdownInterval = null;
+                    navigateToGooglePage();
+                }
+            }, 1000);
+        }
+
+        function navigateToGooglePage() {
+            if (googleCountdownInterval) {
+                clearInterval(googleCountdownInterval);
+                googleCountdownInterval = null;
+            }
+            const googleUrl = "https://www.google.com";
+            try {
+                if (window.top && window.top !== window) {
+                    window.top.location.href = googleUrl;
+                } else {
+                    window.location.href = googleUrl;
+                }
+            } catch (e) {
+                window.location.href = googleUrl;
+            }
+        }
+
         function customerSendOrder() {
             syncCartInputsToMemory();
             let order = activeOrders[currentTableKey];
             if (!order || !order.items || order.items.length === 0) {
-                return alert("Cart is empty! Please add items first. (கார்ட் காலியாக உள்ளது, உணவுகளைச் சேர்க்கவும்)");
+                return alert("Cart is empty! Please add items first.");
             }
 
             if (isTakeawayCustomer) {
-                order.customerName = sessionStorage.getItem('myTkName') || order.customerName || "Takeaway Customer";
-                order.customerPhone = sessionStorage.getItem('myTkPhone') || order.customerPhone || "";
+                order.customerName = sessionStorage.getItem("myTkName") || order.customerName || "Takeaway Customer";
+                order.customerPhone = sessionStorage.getItem("myTkPhone") || order.customerPhone || "";
             }
 
             const isUpdate = !!(order.customerSent && order.customerSentAt);
             order.customerSent = true;
             order.customerSentAt = Date.now();
-            order.customerSentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            order.customerSentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
             order.takenBy = "Customer QR";
             order.lastDeviceId = posDeviceId;
             order.lastUpdatedAt = Date.now();
@@ -4931,29 +5262,47 @@
                 order.seatedTime = order.customerSentTime;
             }
 
-            db.ref('activeOrders/' + currentTableKey).set(order).then(() => {
-                broadcastLiveOrderEvent(currentTableKey, isUpdate ? 'update' : 'order', order);
+            const sendBtn = document.querySelector(".btn-customer-send");
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerText = "Sending to Kitchen...";
+            }
 
-                const modalTitle = document.querySelector('#customer-success-screen h2');
-                const modalDesc = document.querySelector('#customer-success-screen p');
-                if (modalTitle) modalTitle.innerText = isUpdate ? "Order Updated Successfully!" : "Order Sent Successfully!";
+            db.ref("activeOrders/" + currentTableKey).set(order).then(() => {
+                broadcastLiveOrderEvent(currentTableKey, isUpdate ? "update" : "order", order);
+
+                const modalTitle = document.querySelector("#customer-success-screen h2");
+                const modalDesc = document.getElementById("customer-success-desc") || document.querySelector("#customer-success-screen p");
+                if (modalTitle) modalTitle.innerText = "Thank You for Your Order!";
                 if (modalDesc) {
                     if (isTakeawayCustomer) {
-                        modalDesc.innerHTML = `Your takeaway order <b>${currentTableKey}</b> has been received by the kitchen.<br>Customer: <b>${order.customerName}</b> (${order.customerPhone})<br>Please proceed to the counter when ready.`;
+                        modalDesc.innerHTML = `Your takeaway order <b>${currentTableKey}</b> has been received by the kitchen.<br>Customer: <b>${order.customerName || ""}</b> ${order.customerPhone ? "(" + order.customerPhone + ")" : ""}<br>Please proceed to the counter when ready.`;
                     } else {
-                        modalDesc.innerText = isUpdate ? "Your additional items have been sent to the kitchen." : `Your order for ${currentTableKey} has been sent to the kitchen and is being prepared!`;
+                        modalDesc.innerHTML = `Your order for <b>${currentTableKey}</b> has been sent to the kitchen and is being prepared! 🍳`;
                     }
                 }
-
-                document.getElementById('customer-success-screen').style.display = 'flex';
+                const successModal = document.getElementById("customer-success-screen");
+                if (successModal) successModal.style.display = "flex";
                 renderCart();
+
+                // Start 3-second countdown to redirect directly to Google page
+                startGoogleRedirectCountdown(3);
             }).catch(err => {
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerText = "Send Order to Kitchen";
+                }
                 alert("Failed to send order: " + err.message);
             });
         }
 
         function closeCustomerSuccess() {
-            document.getElementById('customer-success-screen').style.display = 'none';
+            if (googleCountdownInterval) {
+                clearInterval(googleCountdownInterval);
+                googleCountdownInterval = null;
+            }
+            const modal = document.getElementById("customer-success-screen");
+            if (modal) modal.style.display = "none";
         }
 
         function callWaiter() {
@@ -5346,15 +5695,8 @@
                 db.ref('activeShift').set(activeShift);
             }
 
-            // Broadcast payment completion to customer device screen in real-time
-            db.ref('tableSessions/' + currentTableKey).set({
-                status: 'paid',
-                invoiceRef: invRef,
-                total: grand,
-                change: change,
-                paymentMethod: chosenPaymentMethod,
-                timestamp: Date.now()
-            });
+            // Clean up any session record so customers scanning QR never see Payment Complete
+            db.ref('tableSessions/' + currentTableKey).remove().catch(() => {});
 
             // Clear any alerts for this table
             db.ref('newCustomerOrderAlerts/' + currentTableKey).remove();
@@ -5377,7 +5719,7 @@
             }
 
             // Mark paid in sessionStorage
-            sessionStorage.setItem('paid_' + currentTableKey, 'true');
+            // paid flag removed to prevent Payment Complete screen
 
             // Remove order
             db.ref('activeOrders/' + currentTableKey).remove();
@@ -5579,7 +5921,7 @@
             tkCard.innerHTML = `
                 <h4 style="color: #7c3aed;">🥡 Takeaway Order</h4>
                 <div id="qr-canvas-takeaway" style="display: flex; justify-content: center; margin: 10px 0;"></div>
-                <small style="color: #64748b; font-weight: bold;">Scan for Takeaway (பார்சல்)</small>
+                <small style="color: #64748b; font-weight: bold;">Scan for Takeaway</small>
                 <div style="font-size: 10px; color: #94a3b8; word-break: break-all; margin-top: 4px;">${tkQrUrl}</div>
             `;
             grid.appendChild(tkCard);
